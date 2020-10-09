@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { Note, Issue, GetIssues } from '../api-connections/Issues';
+import { Issue, GetIssues } from '../api-connections/Issues';
 import { Table } from 'react-bootstrap';
 
 export interface IssueTableProps {}
