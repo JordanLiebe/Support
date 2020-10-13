@@ -23,11 +23,28 @@ export interface Issue {
   assigned: string;
 }
 
-export async function GetIssues() {
+export interface IssueFilters {
+  Id?: number | null;
+  Subject?: string | null;
+  Priority?: string | null;
+  Category?: string | null;
+  Department?: string | null;
+  Status?: string | null;
+  Author?: string | null;
+  Assignee?: string | null;
+}
+
+export async function GetIssues(Filters: IssueFilters) {
   let issues: Issue[] = [];
-  let response = await fetch(apiUrl + '/Issue').catch((error) =>
-    console.error(error),
-  );
+  const queryParams = new URLSearchParams();
+  Object.keys(Filters).forEach((prop) => {
+    let value = Object.entries(Filters)
+      .filter(([key, value]) => value != undefined && value != '')
+      .find(([key, value]) => key === prop);
+    if (value) queryParams.append(prop, value[1]);
+  });
+  let fetchUrl = apiUrl + '/Issue?' + queryParams.toString();
+  let response = await fetch(fetchUrl).catch((error) => console.error(error));
   if (response && response.status === 200) {
     issues = await response.json();
   }

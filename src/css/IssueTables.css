@@ -1,0 +1,46 @@
+/* Filtered Issue Table */
+.FIT_Container {
+  display: flex;
+  transition: all 2s ease-out;
+  flex-direction: row;
+  height: 100%;
+}
+
+.FIT_Sidebar {
+  transition: all 2s ease-out;
+  height: 90vh;
+  flex-grow: 25;
+  flex-shrink: 0;
+  flex-basis: auto;
+}
+
+.FIT_Sidebar_Contents {
+  height: 100%;
+  background-color: #4a4f58;
+}
+
+.FIT_Sidebar_Toggle {
+  display: inline-block;
+  flex-grow: 1;
+  min-width: 10px;
+  min-height: 100%;
+  background-color: silver;
+  min-height: 200px;
+}
+
+.FIT_Sidebar_Item {
+  margin: 10px;
+  margin-top: 0;
+  padding-top: 10px;
+  min-width: 0;
+}
+
+.FIT_Table {
+  flex-grow: 75;
+  flex-basis: 100%;
+}
+
+.FIT_SidebarContents {
+  background-color: darkslategray;
+  color: white;
+}
