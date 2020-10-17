@@ -18,9 +18,9 @@ export interface Issue {
   notes: Note[];
   status: string;
   author: string;
-  created: string;
+  created: Date;
   assignee: string;
-  assigned: string;
+  assigned: Date;
 }
 
 export interface IssueFilters {
@@ -39,7 +39,7 @@ export async function GetIssues(Filters: IssueFilters) {
   const queryParams = new URLSearchParams();
   Object.keys(Filters).forEach((prop) => {
     let value = Object.entries(Filters)
-      .filter(([key, value]) => value != undefined && value != '')
+      .filter(([key, value]) => value !== undefined && value !== '')
       .find(([key, value]) => key === prop);
     if (value) queryParams.append(prop, value[1]);
   });

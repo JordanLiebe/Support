@@ -73,9 +73,9 @@ export const IssueTable: FC<IssueTableProps> = ({
               </td>
               <td>{issue.status}</td>
               <td>{issue.author}</td>
-              <td>{issue.created}</td>
+              <td>{new Date(issue.created).toLocaleString()}</td>
               <td>{issue.assignee}</td>
-              <td>{issue.assigned}</td>
+              <td>{new Date(issue.assigned).toLocaleString()}</td>
             </tr>
           ))}
       </tbody>
@@ -85,7 +85,6 @@ export const IssueTable: FC<IssueTableProps> = ({
 
 export const FilteredIssueTable: FC = () => {
   const [showSidebar, setShowSidebar] = useState<boolean>(false);
-  const [id, setId] = useState<number>();
   const [subject, setSubject] = useState<string>();
   const [priority, setPriority] = useState<string>();
   const [category, setCategory] = useState<string>();
@@ -133,10 +132,18 @@ export const FilteredIssueTable: FC = () => {
           </Form.Group>
         </div>
       </div>
-      <div
+      <button
         className="FIT_Sidebar_Toggle"
         onClick={() => setShowSidebar(!showSidebar)}
-      ></div>
+      >
+        <span>F</span>
+        <span>i</span>
+        <span>l</span>
+        <span>t</span>
+        <span>e</span>
+        <span>r</span>
+        <span>s</span>
+      </button>
       <div className="FIT_Table">
         <IssueTable Subject={subject} Priority={priority} Category={category} />
       </div>
