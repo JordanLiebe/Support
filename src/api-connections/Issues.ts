@@ -1,4 +1,5 @@
-const apiUrl = 'https://jmliebe-support-api.azurewebsites.net';
+import { useContext } from 'react';
+import AuthenticationContext from '../contexts/AuthenticationContext';
 
 export interface Note {
   id: number;
@@ -34,7 +35,7 @@ export interface IssueFilters {
   Assignee?: string | null;
 }
 
-export async function GetIssues(Filters: IssueFilters) {
+export async function GetIssues(Filters: IssueFilters, token?: string) {
   let issues: Issue[] = [];
   const queryParams = new URLSearchParams();
   Object.keys(Filters).forEach((prop) => {
@@ -43,8 +44,12 @@ export async function GetIssues(Filters: IssueFilters) {
       .find(([key, value]) => key === prop);
     if (value) queryParams.append(prop, value[1]);
   });
-  let fetchUrl = apiUrl + '/Issue?' + queryParams.toString();
-  let response = await fetch(fetchUrl).catch((error) => console.error(error));
+  let fetchUrl =
+    process.env.REACT_APP_API_URL + '/Issue?' + queryParams.toString();
+  let response = await fetch(fetchUrl, {
+    headers: { Authorization: token ? token : '' },
+    credentials: 'include',
+  }).catch((error) => console.error(error));
   if (response && response.status === 200) {
     issues = await response.json();
   }

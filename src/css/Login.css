@@ -1,0 +1,17 @@
+.Login-Page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.Login-Container {
+  min-width: 300px;
+  padding: 30px;
+  background: #343a40;
+  color: white;
+}
+
+.Text-Alert {
+  color: red;
+}
