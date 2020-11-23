@@ -5,9 +5,9 @@ import { LoginResponse } from '../interfaces/authentication';
 import '../css/Login.css';
 import { useHistory } from 'react-router-dom';
 
-const Login: FC = () => {
-  const [login, setLogin] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+const MFA: FC = () => {
+  const [code, setCode] = useState<number>(0);
+  const [codeField, setCodeField] = useState<string>('');
   const [loginErrors, setLoginErrors] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const history = useHistory();
@@ -15,18 +15,15 @@ const Login: FC = () => {
 
   const authenticate = async () => {
     setLoading(true);
-    let loginResp: LoginResponse | undefined = await auth.login(
-      login,
-      password,
+    if (auth.isLoggedIn === false) history.push('/Login');
+    let loginResp: LoginResponse | undefined = await auth.verifyCode(
+      code,
+      auth.jwt,
     );
     setLoading(false);
     if (loginResp) {
-      if (loginResp.success) {
-        if (loginResp.requireMFA) {
-          history.push('/MFA');
-        } else {
-          history.push('/');
-        }
+      if (loginResp.success && !loginResp.requireMFA) {
+        history.push('/');
       } else {
         setLoginErrors(loginResp.errors);
       }
@@ -36,33 +33,28 @@ const Login: FC = () => {
   return (
     <div className="Login-Page">
       <div className="Login-Container">
-        <h2>Login</h2>
+        <h2>Verification</h2>
         <Form
           onSubmit={(e) => {
             e.preventDefault();
             authenticate();
           }}
         >
-          <Form.Group controlId="formBasicEmail">
-            <Form.Label>Username</Form.Label>
+          <Form.Group controlId="formBasicCode">
+            <Form.Label>6 Digit Code</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Enter Username"
-              value={login}
+              placeholder="Enter Code"
+              value={codeField}
               onChange={(e) => {
-                setLogin(e.currentTarget.value);
-              }}
-            />
-          </Form.Group>
-
-          <Form.Group controlId="formBasicPassword">
-            <Form.Label>Password</Form.Label>
-            <Form.Control
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.currentTarget.value);
+                const re = /^[0-9\b]{0,6}$/;
+                if (re.test(e.currentTarget.value)) {
+                  setCodeField(e.currentTarget.value);
+                  var num = parseInt(e.currentTarget.value);
+                  setCode(num);
+                } else {
+                  setCode(0);
+                }
               }}
             />
           </Form.Group>
@@ -87,4 +79,4 @@ const Login: FC = () => {
   );
 };
 
-export default Login;
+export default MFA;

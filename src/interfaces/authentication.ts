@@ -14,6 +14,7 @@ export interface User {
 export interface LoginResponse {
   login: string;
   success: boolean;
+  requireMFA: boolean;
   errors: string[];
   jwt: string;
 }

@@ -7,6 +7,7 @@ const Authentication: FC = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
   const [jwt, setJwt] = useState<string>('');
   const [user, setUser] = useState<User>();
+  const [requireMFA, setRequireMFA] = useState<boolean>(true);
 
   const authenticateUser = async (username: string, pass: string) => {
     const authenticationUrl = process.env.REACT_APP_API_URL + '/Auth/Login';
@@ -26,6 +27,37 @@ const Authentication: FC = ({ children }) => {
 
       setLoggedIn(loginResponse.success);
       setJwt(loginResponse.jwt);
+      setRequireMFA(loginResponse.requireMFA);
+
+      console.log(loginResponse);
+
+      return loginResponse;
+    }
+
+    return undefined;
+  };
+
+  const verifyToken = async (code: number, token: string) => {
+    const authenticationUrl = process.env.REACT_APP_API_URL + '/Auth/Code';
+    let response = await fetch(authenticationUrl, {
+      method: 'POST',
+      body: JSON.stringify({
+        Code: code,
+        Token: token,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).catch((e) => console.error(e));
+
+    if (response && response.status === 200) {
+      let loginResponse: LoginResponse = await response.json();
+
+      setLoggedIn(loginResponse.success);
+      setJwt(loginResponse.jwt);
+      setRequireMFA(loginResponse.requireMFA);
+
+      console.log(loginResponse);
 
       return loginResponse;
     }
@@ -39,27 +71,29 @@ const Authentication: FC = ({ children }) => {
 
   useEffect(() => {
     const getUser = async () => {
-      const authenticationUrl = process.env.REACT_APP_API_URL + '/Auth/Test';
-      let response = await fetch(authenticationUrl, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + jwt,
-        },
-      }).catch((e) => console.error(e));
+      const authenticationUrl = process.env.REACT_APP_API_URL + '/Auth/Me';
+      if (requireMFA == false) {
+        let response = await fetch(authenticationUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + jwt,
+          },
+        }).catch((e) => console.error(e));
 
-      if (response && response.status === 200) {
-        let userData: User = await response.json();
-        setUser(userData);
-        setLoggedIn(true);
+        if (response && response.status === 200) {
+          let userData: User = await response.json();
+          setUser(userData);
+          setLoggedIn(true);
+        }
       }
     };
-    if (jwt !== '') getUser();
+    if (jwt !== '' && !requireMFA) getUser();
     else {
       setUser(undefined);
       setLoggedIn(false);
     }
-  }, [jwt]);
+  }, [jwt, requireMFA]);
 
   return (
     <AuthenticationContext.Provider
@@ -67,10 +101,18 @@ const Authentication: FC = ({ children }) => {
         user: user,
         jwt: jwt,
         isLoggedIn: loggedIn,
+        requireMFA: requireMFA,
         login: async (username: string, password: string) => {
           let response: LoginResponse | undefined = await authenticateUser(
             username,
             password,
+          );
+          return response;
+        },
+        verifyCode: async (code: number, token: string) => {
+          let response: LoginResponse | undefined = await verifyToken(
+            code,
+            token,
           );
           return response;
         },

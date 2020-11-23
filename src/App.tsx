@@ -7,11 +7,12 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import Header from './components/Header';
-import { FilteredIssueTable } from './components/IssueTables';
+import { IssueTable } from './components/IssueTables';
 import Authentication from './components/Authentication';
 import RequireAuth from './components/RequireAuth';
 import Dashboard from './components/Dashboard';
 import Login from './components/Login';
+import MFA from './components/MFA';
 import Logout from './components/Logout';
 import NotFound from './components/errors/NotFound';
 
@@ -29,11 +30,12 @@ function App() {
               exact
               render={() => (
                 <RequireAuth>
-                  <FilteredIssueTable />
+                  <IssueTable />
                 </RequireAuth>
               )}
             />
             <Route path="/Login" exact render={() => <Login />} />
+            <Route path="/MFA" exact render={() => <MFA />} />
             <Route path="/Logout" exact render={() => <Logout />} />
             <Route component={NotFound} />
           </Switch>
