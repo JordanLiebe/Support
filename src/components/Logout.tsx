@@ -4,31 +4,12 @@ import { useHistory } from 'react-router-dom';
 import { LoginResponse } from '../interfaces/authentication';
 import '../css/Login.css';
 
-const Login: FC = () => {
+const Logout: FC = () => {
   const history = useHistory();
   const auth = useContext(AuthenticationContext);
 
-  const authenticateUser = async (username: string, pass: string) => {
-    const authenticationUrl = process.env.REACT_APP_API_URL + '/Auth/Login';
-    let response = await fetch(authenticationUrl, {
-      method: 'POST',
-      body: JSON.stringify({
-        username: username,
-        password: pass,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).catch((e) => console.error(e));
-
-    if (response && response.status === 200) {
-      let loginResponse: LoginResponse = await response.json();
-
-      return loginResponse;
-    }
-
-    return undefined;
-  };
+  auth.logout();
+  history.push('/');
 
   return (
     <div className="Login-Page">
@@ -39,4 +20,4 @@ const Login: FC = () => {
   );
 };
 
-export default Login;
+export default Logout;
