@@ -14,6 +14,7 @@ import Dashboard from './components/Dashboard';
 import Login from './components/Login';
 import MFA from './components/MFA';
 import Logout from './components/Logout';
+import Register from './components/Register';
 import NotFound from './components/errors/NotFound';
 
 function App() {
@@ -27,16 +28,23 @@ function App() {
             <Route exact path="/" render={() => <Dashboard />} />
             <Route
               path="/Issues"
-              exact
               render={() => (
                 <RequireAuth>
                   <IssueTable />
                 </RequireAuth>
               )}
             />
-            <Route path="/Login" exact render={() => <Login />} />
-            <Route path="/MFA" exact render={() => <MFA />} />
-            <Route path="/Logout" exact render={() => <Logout />} />
+            <Route path="/Login" render={() => <Login />} />
+            <Route path="/MFA" render={() => <MFA />} />
+            <Route
+              path="/Logout"
+              render={() => (
+                <RequireAuth>
+                  <Logout />
+                </RequireAuth>
+              )}
+            />
+            <Route path="/Register" render={() => <Register />} />
             <Route component={NotFound} />
           </Switch>
         </Router>

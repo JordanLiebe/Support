@@ -13,7 +13,7 @@ export interface Note {
 export interface Issue {
   id: number;
   subject: string;
-  priority: string;
+  priority: 'LOW' | 'MED' | 'HIGH';
   category: string;
   department: string;
   notes: Note[];
@@ -22,6 +22,14 @@ export interface Issue {
   created: Date;
   assignee: string;
   assigned: Date;
+}
+
+export interface CreateIssue {
+  subject: string;
+  priority: string;
+  category: string;
+  department: string;
+  initial_note: string;
 }
 
 export interface IssueFilters {
@@ -54,4 +62,22 @@ export async function GetIssues(Filters: IssueFilters, token?: string) {
     issues = await response.json();
   }
   return issues;
+}
+
+export async function PostIssues(Issue: CreateIssue, token?: string) {
+  const postUrl = process.env.REACT_APP_API_URL + '/Issue';
+  let postResponse = await fetch(postUrl, {
+    method: 'POST',
+    body: JSON.stringify(Issue),
+    headers: {
+      Authorization: `Bearer ${token !== '' ? token : ''}`,
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+  if (postResponse && postResponse.status === 200) {
+    let postResponseBody: Issue = await postResponse.json();
+    console.log(postResponse);
+    console.log(postResponseBody);
+  }
 }

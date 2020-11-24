@@ -42,9 +42,12 @@ export const IssueTable: FC<IssueTableProps> = ({
       setIssues(
         await GetIssues(
           {
-            Subject: Subject,
-            Priority: Priority,
-            Category: Category,
+            Subject: subject,
+            Priority: priority,
+            Category: category,
+            Department: department,
+            Status: status,
+            Author: author,
           },
           'Bearer ' + auth.jwt,
         ),
@@ -52,7 +55,7 @@ export const IssueTable: FC<IssueTableProps> = ({
       setUpdated(true);
     };
     getIssuesAsync();
-  }, [Subject, Priority, Category, updated]);
+  }, [subject, priority, category, status, updated]);
   return (
     <FiltersContext.Provider
       value={{
@@ -69,19 +72,29 @@ export const IssueTable: FC<IssueTableProps> = ({
           setCategory(category);
         },
         department: department,
-        setDepartment: (department: string) => {},
+        setDepartment: (department: string) => {
+          setDepartment(department);
+        },
         status: status,
         setStatus: (status: string) => {
           setStatus(status);
         },
         author: author,
-        setAuthor: (author: string) => {},
+        setAuthor: (author: string) => {
+          setAuthor(author);
+        },
         created: created,
-        setCreated: (created: Date) => {},
+        setCreated: (created: Date) => {
+          setCreated(created);
+        },
         assignee: assignee,
-        setAssignee: (assignee: string) => {},
+        setAssignee: (assignee: string) => {
+          setAssignee(assignee);
+        },
         assigned: assigned,
-        setAssigned: (assigned: Date) => {},
+        setAssigned: (assigned: Date) => {
+          setAssigned(assigned);
+        },
       }}
     >
       <div className="IT_Filter_Container">
@@ -129,7 +142,9 @@ export const IssueTable: FC<IssueTableProps> = ({
                           issue.notes
                             .filter((note) => note !== null)
                             .map((note) => (
-                              <li key={note.id}>{note.content}</li>
+                              <div className="IT_Note" key={note.id}>
+                                {note.content}
+                              </div>
                             ))}
                       </ul>
                     </td>

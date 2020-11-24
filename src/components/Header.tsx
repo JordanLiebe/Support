@@ -38,6 +38,9 @@ const Header: FC = () => {
           </Nav>
         ) : (
           <Nav>
+            <Link to="/Register" className="nav-link">
+              Register
+            </Link>
             <Link to="/Login" className="nav-link">
               Login
             </Link>

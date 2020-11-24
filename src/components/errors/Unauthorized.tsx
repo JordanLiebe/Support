@@ -18,7 +18,11 @@ const Unauthorized: FC = () => {
       <div id="View">
         <div id="Float">
           <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
-            <img src={AhAhAh} alt="Ah Ah Ah" />
+            <img
+              src={AhAhAh}
+              style={{ display: 'inline-block', maxWidth: '100%' }}
+              alt="Ah Ah Ah"
+            />
           </a>
         </div>
       </div>

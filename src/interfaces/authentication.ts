@@ -11,6 +11,15 @@ export interface User {
   status: string;
 }
 
+export interface CreateUser {
+  login: string;
+  password: string;
+  email: string;
+  first_Name: string;
+  middle_Name: string;
+  last_Name: string;
+}
+
 export interface LoginResponse {
   login: string;
   success: boolean;

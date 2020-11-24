@@ -64,17 +64,6 @@ const Sidebar: FC = () => {
           />
         </Form.Group>
         <Form.Group>
-          <Form.Label>Author</Form.Label>
-          <Form.Control
-            as="input"
-            value={filters.author}
-            onChange={(e) => {
-              filters.setAuthor(e.currentTarget.value);
-            }}
-            placeholder="Author"
-          />
-        </Form.Group>
-        <Form.Group>
           <Form.Label>Assignee</Form.Label>
           <Form.Control
             as="input"

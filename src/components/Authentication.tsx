@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import AuthenticationContext from '../contexts/AuthenticationContext';
 
-import { User, LoginResponse } from '../interfaces/authentication';
+import { User, LoginResponse, CreateUser } from '../interfaces/authentication';
 
 const Authentication: FC = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
@@ -69,6 +69,33 @@ const Authentication: FC = ({ children }) => {
     setJwt('');
   };
 
+  const registerUser = async (user: CreateUser) => {
+    const authenticationUrl = process.env.REACT_APP_API_URL + '/Auth/Register';
+    let response = await fetch(authenticationUrl, {
+      method: 'POST',
+      body: JSON.stringify({
+        login: user.login,
+        password: user.password,
+        email: user.email,
+        first_name: user.first_Name,
+        middle_name: user.middle_Name,
+        last_name: user.last_Name,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).catch((e) => console.error(e));
+
+    console.log(response);
+
+    if (response && response.status === 200) {
+      let loginResponse: User | undefined = await response.json();
+      return loginResponse;
+    }
+
+    return undefined;
+  };
+
   useEffect(() => {
     const getUser = async () => {
       const authenticationUrl = process.env.REACT_APP_API_URL + '/Auth/Me';
@@ -88,12 +115,8 @@ const Authentication: FC = ({ children }) => {
         }
       }
     };
-    if (jwt !== '' && !requireMFA) getUser();
-    else {
-      setUser(undefined);
-      setLoggedIn(false);
-    }
-  }, [jwt, requireMFA]);
+    if (!requireMFA) getUser();
+  }, [loggedIn, jwt]);
 
   return (
     <AuthenticationContext.Provider
@@ -118,6 +141,10 @@ const Authentication: FC = ({ children }) => {
         },
         logout: () => {
           clearAuthentication();
+        },
+        register: async (user: CreateUser) => {
+          let response: User | undefined = await registerUser(user);
+          return response;
         },
       }}
     >

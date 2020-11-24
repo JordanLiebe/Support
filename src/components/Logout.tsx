@@ -1,7 +1,6 @@
 import React, { FC, useContext } from 'react';
 import AuthenticationContext from '../contexts/AuthenticationContext';
 import { useHistory } from 'react-router-dom';
-import { LoginResponse } from '../interfaces/authentication';
 import '../css/Login.css';
 
 const Logout: FC = () => {

@@ -9,6 +9,18 @@
   flex-basis: 85%;
 }
 
+.IT_Table {
+  font-size: 20px;
+  overflow: auto;
+  display: inline-table;
+  table-layout: auto;
+}
+
+.IT_Note {
+  font-size: 15px;
+  border-radius: 10px;
+}
+
 /* Sidebar Styles */
 .Sidebar_Container {
   flex-basis: 15%;

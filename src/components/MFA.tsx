@@ -15,7 +15,6 @@ const MFA: FC = () => {
 
   const authenticate = async () => {
     setLoading(true);
-    if (auth.isLoggedIn === false) history.push('/Login');
     let loginResp: LoginResponse | undefined = await auth.verifyCode(
       code,
       auth.jwt,

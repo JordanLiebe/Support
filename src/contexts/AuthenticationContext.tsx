@@ -1,5 +1,5 @@
 import React from 'react';
-import { LoginResponse, User } from '../interfaces/authentication';
+import { LoginResponse, CreateUser, User } from '../interfaces/authentication';
 
 const AuthenticationContext = React.createContext({
   user: {} as User | undefined,
@@ -19,6 +19,9 @@ const AuthenticationContext = React.createContext({
     return undefined;
   },
   logout: () => {},
+  register: async (user: CreateUser): Promise<User | undefined> => {
+    return undefined;
+  },
 });
 
 export default AuthenticationContext;
