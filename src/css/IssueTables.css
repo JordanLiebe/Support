@@ -16,6 +16,11 @@
   table-layout: auto;
 }
 
+.IT_Row:hover {
+  color: #c5c5c5;
+  border-left: 1px solid black;
+}
+
 .IT_Note {
   font-size: 15px;
   border-radius: 10px;
@@ -36,6 +41,7 @@
 .ActionBar_Container {
   display: flex;
   flex-direction: row;
+  background: #3e444a;
 }
 
 .ActionBar_Button {

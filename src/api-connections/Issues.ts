@@ -1,47 +1,45 @@
-import { useContext } from 'react';
-import AuthenticationContext from '../contexts/AuthenticationContext';
+import {
+  Issue,
+  IssueFilters,
+  CreateIssue,
+  UpdateIssue,
+  Note,
+  CreateNote,
+} from '../interfaces/Issue';
 
-export interface Note {
-  id: number;
-  issueId: number;
-  content: string;
-  flag: boolean;
-  author: string;
-  created: string;
-}
+export const GetIssue = async (issueId: number, token?: string) => {
+  let issue: Issue | undefined = undefined;
+  let fetchUrl = process.env.REACT_APP_API_URL + '/Issue/' + issueId;
+  let response = await fetch(fetchUrl, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token !== '' ? token : ''}`,
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  }).catch((error) => console.error(error));
+  if (response && response.status === 200) {
+    issue = await response.json();
+  }
+  return issue;
+};
 
-export interface Issue {
-  id: number;
-  subject: string;
-  priority: 'LOW' | 'MED' | 'HIGH';
-  category: string;
-  department: string;
-  notes: Note[];
-  status: string;
-  author: string;
-  created: Date;
-  assignee: string;
-  assigned: Date;
-}
-
-export interface CreateIssue {
-  subject: string;
-  priority: string;
-  category: string;
-  department: string;
-  initial_note: string;
-}
-
-export interface IssueFilters {
-  Id?: number | null;
-  Subject?: string | null;
-  Priority?: string | null;
-  Category?: string | null;
-  Department?: string | null;
-  Status?: string | null;
-  Author?: string | null;
-  Assignee?: string | null;
-}
+export const GetNotes = async (issueId: number, token: string) => {
+  let issue: Issue | undefined = undefined;
+  let fetchUrl = process.env.REACT_APP_API_URL + '/Issue/' + issueId + '/Notes';
+  let response = await fetch(fetchUrl, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token !== '' ? token : ''}`,
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  }).catch((error) => console.error(error));
+  if (response && response.status === 200) {
+    issue = await response.json();
+  }
+  return issue;
+};
 
 export async function GetIssues(Filters: IssueFilters, token?: string) {
   let issues: Issue[] = [];
@@ -55,7 +53,10 @@ export async function GetIssues(Filters: IssueFilters, token?: string) {
   let fetchUrl =
     process.env.REACT_APP_API_URL + '/Issue?' + queryParams.toString();
   let response = await fetch(fetchUrl, {
-    headers: { Authorization: token ? token : '' },
+    headers: {
+      Authorization: `Bearer ${token !== '' ? token : ''}`,
+      'Content-Type': 'application/json',
+    },
     credentials: 'include',
   }).catch((error) => console.error(error));
   if (response && response.status === 200) {
@@ -77,7 +78,53 @@ export async function PostIssues(Issue: CreateIssue, token?: string) {
   });
   if (postResponse && postResponse.status === 200) {
     let postResponseBody: Issue = await postResponse.json();
-    console.log(postResponse);
-    console.log(postResponseBody);
   }
 }
+
+export async function PutIssues(Id: number, Issue: UpdateIssue, token: string) {
+  const postUrl = process.env.REACT_APP_API_URL + '/Issue/' + Id;
+  let postResponse = await fetch(postUrl, {
+    method: 'PUT',
+    body: JSON.stringify(Issue),
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+  if (postResponse && postResponse.status === 200) {
+    let postResponseBody: Issue = await postResponse.json();
+  }
+}
+
+export const PostNote = async (Note: CreateNote, token: string) => {
+  const postUrl = process.env.REACT_APP_API_URL + '/Note';
+  let postResponse = await fetch(postUrl, {
+    method: 'POST',
+    body: JSON.stringify(Note),
+    headers: {
+      Authorization: `Bearer ${token !== '' ? token : ''}`,
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+  if (postResponse && postResponse.status === 200) {
+    let postResponseBody: Note = await postResponse.json();
+  }
+};
+
+export const DeleteNote = async (id: number, token: string) => {
+  const deleteUrl = process.env.REACT_APP_API_URL + '/Note/' + id;
+  let deleteResponse = await fetch(deleteUrl, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token !== '' ? token : ''}`,
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+  console.log(deleteResponse);
+  if (deleteResponse && deleteResponse.status === 200) {
+    let postResponseBody: Note = await deleteResponse.json();
+  }
+};

@@ -10,11 +10,11 @@ import Header from './components/Header';
 import { IssueTable } from './components/IssueTables';
 import Authentication from './components/Authentication';
 import RequireAuth from './components/RequireAuth';
-import Dashboard from './components/Dashboard';
-import Login from './components/Login';
-import MFA from './components/MFA';
-import Logout from './components/Logout';
-import Register from './components/Register';
+import Home from './components/pages/Home';
+import Dashboard from './components/pages/Dashboard';
+import Login from './components/pages/Login';
+import Logout from './components/pages/Logout';
+import Register from './components/pages/Register';
 import NotFound from './components/errors/NotFound';
 
 function App() {
@@ -25,7 +25,15 @@ function App() {
         <Router history={history}>
           <Header />
           <Switch>
-            <Route exact path="/" render={() => <Dashboard />} />
+            <Route exact path="/" render={() => <Home />} />
+            <Route
+              path="/Dashboard"
+              render={() => (
+                <RequireAuth>
+                  <Dashboard />
+                </RequireAuth>
+              )}
+            />
             <Route
               path="/Issues"
               render={() => (
@@ -35,7 +43,6 @@ function App() {
               )}
             />
             <Route path="/Login" render={() => <Login />} />
-            <Route path="/MFA" render={() => <MFA />} />
             <Route
               path="/Logout"
               render={() => (

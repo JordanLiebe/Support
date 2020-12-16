@@ -12,9 +12,16 @@ const Header: FC = () => {
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
-          <Link to="/" className="nav-link">
-            Dashboard
-          </Link>
+          {!auth.isLoggedIn && !auth.user && (
+            <Link to="/" className="nav-link">
+              Home
+            </Link>
+          )}
+          {auth.isLoggedIn && auth.user && (
+            <Link to="/Dashboard" className="nav-link">
+              Dashboard
+            </Link>
+          )}
           {auth.isLoggedIn && auth.user && (
             <Link to="/Issues" className="nav-link">
               Issues

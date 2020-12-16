@@ -1,21 +1,26 @@
 import React from 'react';
-import { LoginResponse, CreateUser, User } from '../interfaces/authentication';
+import {
+  LoginResponse,
+  CreateUser,
+  User,
+  GetCodeResponse,
+  GetLoginResponse,
+} from '../interfaces/Authentication';
 
 const AuthenticationContext = React.createContext({
   user: {} as User | undefined,
   jwt: '' as string,
   isLoggedIn: false as boolean,
-  requireMFA: false as boolean,
   login: async (
     login: string,
     password: string,
-  ): Promise<LoginResponse | undefined> => {
+  ): Promise<GetLoginResponse | undefined> => {
     return undefined;
   },
   verifyCode: async (
     code: number,
     token: string,
-  ): Promise<LoginResponse | undefined> => {
+  ): Promise<GetCodeResponse | undefined> => {
     return undefined;
   },
   logout: () => {},

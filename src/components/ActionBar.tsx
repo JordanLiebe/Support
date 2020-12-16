@@ -1,10 +1,16 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import CreateIssueModal from './modals/CreateIssueModal';
 
-const ActionBar: FC = () => {
-  const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
+interface ActionBarProps {
+  onUpdate: () => void;
+}
 
+const ActionBar: FC<ActionBarProps> = ({ onUpdate }) => {
+  const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
+  useEffect(() => {
+    onUpdate();
+  }, [showCreateModal]);
   return (
     <div className="ActionBar_Container">
       <Button

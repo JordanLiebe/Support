@@ -1,8 +1,12 @@
 import React, { FC, useState, useContext } from 'react';
 import { Form, Button, Spinner } from 'react-bootstrap';
-import AuthenticationContext from '../contexts/AuthenticationContext';
-import { LoginResponse, CreateUser, User } from '../interfaces/authentication';
-import '../css/Login.css';
+import AuthenticationContext from '../../contexts/AuthenticationContext';
+import {
+  LoginResponse,
+  CreateUser,
+  User,
+} from '../../interfaces/Authentication';
+import '../../css/Login.css';
 import { useHistory } from 'react-router-dom';
 
 const Register: FC = () => {
@@ -41,7 +45,7 @@ const Register: FC = () => {
             registerUser();
           }}
         >
-          <Form.Group controlId="formBasicEmail">
+          <Form.Group controlId="register_username">
             <Form.Label>Username</Form.Label>
             <Form.Control
               type="text"
@@ -53,7 +57,7 @@ const Register: FC = () => {
             />
           </Form.Group>
 
-          <Form.Group controlId="formBasicPassword">
+          <Form.Group controlId="register_password">
             <Form.Label>Password</Form.Label>
             <Form.Control
               type="password"
@@ -65,7 +69,7 @@ const Register: FC = () => {
             />
           </Form.Group>
 
-          <Form.Group controlId="formBasicEmail">
+          <Form.Group controlId="register_email">
             <Form.Label>Email</Form.Label>
             <Form.Control
               type="text"
@@ -77,7 +81,7 @@ const Register: FC = () => {
             />
           </Form.Group>
 
-          <Form.Group controlId="formBasicEmail">
+          <Form.Group controlId="register_first_name">
             <Form.Label>First Name</Form.Label>
             <Form.Control
               type="text"
@@ -89,7 +93,7 @@ const Register: FC = () => {
             />
           </Form.Group>
 
-          <Form.Group controlId="formBasicEmail">
+          <Form.Group controlId="register_middle_name">
             <Form.Label>Middle Name</Form.Label>
             <Form.Control
               type="text"
@@ -101,7 +105,7 @@ const Register: FC = () => {
             />
           </Form.Group>
 
-          <Form.Group controlId="formBasicEmail">
+          <Form.Group controlId="register_last_name">
             <Form.Label>Last Name</Form.Label>
             <Form.Control
               type="text"

@@ -1,56 +1,132 @@
-import React, { FC, useContext, useState } from 'react';
-import { Button, Modal, Form } from 'react-bootstrap';
-import { Issue, PostIssues } from '../../api-connections/Issues';
+import React, { FC, useContext, useEffect, useState } from 'react';
+import { Button, Modal, Form, Toast, Spinner } from 'react-bootstrap';
+import {
+  GetIssue,
+  PutIssues,
+  PostNote,
+  DeleteNote,
+} from '../../api-connections/Issues';
+import { Issue, Note, UpdateIssue, CreateNote } from '../../interfaces/Issue';
 import AuthenticationContext from '../../contexts/AuthenticationContext';
+
 interface UpdateIssueModalProps {
   show: boolean;
   setShow: (value: boolean) => void;
-  current: Issue;
+  onUpdate: () => void;
+  issueId: number;
 }
 
 const UpdateIssueModal: FC<UpdateIssueModalProps> = ({
   show,
   setShow,
-  current,
+  onUpdate,
+  issueId,
 }) => {
-  const [subject, setSubject] = useState<string>(current.subject);
-  const [priority, setPriority] = useState<'LOW' | 'MED' | 'HIGH'>(
-    current.priority,
-  );
-  const [category, setCategory] = useState<string>(current.category);
-  const [categories, setCategories] = useState<string[]>([]);
+  // Form Fields //
+  const [id, setId] = useState<number>(0);
+  const [subject, setSubject] = useState<string>('');
+  const [priority, setPriority] = useState<'LOW' | 'MED' | 'HIGH'>('LOW');
+  const [category, setCategory] = useState<string>('');
   const [department, setDepartment] = useState<string>('');
-  const [note, setNote] = useState<string>('');
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [status, setStatus] = useState<string>('');
+
+  // Form Add Note Extension //
+  const [showAddNote, setShowAddNote] = useState<boolean>(false);
+  const [newNote, setNewNote] = useState<string>('');
+
+  // Form State //
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [createModalErrors, setCreateModalErrors] = useState<string[]>([]);
   const auth = useContext(AuthenticationContext);
 
-  const postNewIssue = () => {
-    const postNewIssueAsync = async () => {
-      let token: string = auth.jwt;
-      await PostIssues(
-        {
-          subject: subject,
-          priority: priority,
-          category: category,
-          department: department,
-          initial_note: note,
-        },
-        token,
-      );
+  // Response State //
+  const [response, setResponse] = useState<string>('');
+
+  useEffect(() => {
+    getIssueAsync();
+  }, [issueId, show]);
+
+  function sleep(delay: number) {
+    var start = new Date().getTime();
+    while (new Date().getTime() < start + delay);
+  }
+
+  const getIssueAsync = async () => {
+    let token: string = auth.jwt;
+    let issue: Issue | undefined = await GetIssue(issueId, token);
+    if (issue) {
+      setId(issue.id);
+      setSubject(issue.subject);
+      setDepartment(issue.department);
+      switch (issue.priority) {
+        case 'LOW':
+          setPriority('LOW');
+          break;
+        case 'MED':
+          setPriority('MED');
+          break;
+        case 'HIGH':
+          setPriority('HIGH');
+          break;
+      }
+      switch (issue.department) {
+        case 'Information Technology':
+          setCategories([
+            'Accounts',
+            'Software Engineering',
+            'Desktop',
+            'Remote',
+          ]);
+          break;
+        case 'Maintenance':
+          setCategories(['Moving', 'Custodial', 'Painting']);
+          break;
+        default:
+          setCategories([]);
+          break;
+      }
+      setCategory(issue.category);
+      setNotes(issue.notes);
+    }
+  };
+
+  const postNewNote = async () => {
+    let token: string = auth.jwt;
+    let note: CreateNote = {
+      issueId: issueId,
+      content: newNote,
+      flag: false,
+      author: 'Test',
     };
-    postNewIssueAsync();
+    let response = await PostNote(note, token);
+    onUpdate();
+  };
+
+  const updateIssue = async () => {
+    let token: string = auth.jwt;
+    let issue: UpdateIssue = {
+      subject: subject,
+      priority: priority,
+      category: category,
+      department: department,
+      status: status,
+    };
+    let response = await PutIssues(id, issue, token);
+    setShow(false);
+    onUpdate();
   };
 
   return (
     <Modal show={show}>
       <Modal.Header closeButton onHide={() => setShow(!show)}>
-        <h4>Create Issue</h4>
+        <h4>Update Issue</h4>
       </Modal.Header>
       <Modal.Body>
         <Form
           onSubmit={(e) => {
             e.preventDefault();
-            postNewIssue();
           }}
         >
           <Form.Group>
@@ -136,20 +212,98 @@ const UpdateIssueModal: FC<UpdateIssueModalProps> = ({
             </Form.Control>
           </Form.Group>
           <Form.Group>
-            <Form.Label>Note</Form.Label>
+            <Form.Label>Notes</Form.Label>
+            {notes &&
+              notes.length > 0 &&
+              notes
+                .filter((e) => e !== null)
+                .map((note, i) => {
+                  return (
+                    <Toast
+                      key={'Form_Note_' + i}
+                      style={{ margin: '15px auto 15px auto' }}
+                      onClose={() => {
+                        DeleteNote(note.id, auth.jwt);
+                        let notesTemp = notes.filter((m) => m.id !== note.id);
+                        setNotes(notesTemp);
+                      }}
+                    >
+                      <Toast.Header
+                        closeButton={
+                          auth.user && note && auth.user.uuid === note.author
+                        }
+                      >
+                        <strong>Note: {note && note.id}</strong>
+                      </Toast.Header>
+                      <Toast.Body>{note.content}</Toast.Body>
+                    </Toast>
+                  );
+                })}
+          </Form.Group>
+          <Form.Group>
+            {showAddNote ? (
+              <div>
+                <Form.Control
+                  as="textarea"
+                  value={newNote}
+                  onChange={(e) => {
+                    setNewNote(e.currentTarget.value);
+                  }}
+                  placeholder="Note"
+                />
+                <Button
+                  variant="link"
+                  onClick={() => {
+                    postNewNote();
+                    sleep(2000);
+                    getIssueAsync();
+                  }}
+                >
+                  Save
+                </Button>
+                <Button
+                  variant="link"
+                  onClick={() => setShowAddNote(!showAddNote)}
+                >
+                  Hide
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="link"
+                onClick={() => setShowAddNote(!showAddNote)}
+              >
+                Add
+              </Button>
+            )}
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Status</Form.Label>
             <Form.Control
-              as="textarea"
-              value={note}
+              as="select"
+              value={status}
               onChange={(e) => {
-                setNote(e.currentTarget.value);
+                setStatus(e.currentTarget.value);
               }}
-              placeholder="Note"
-            />
+            >
+              <option value="NEW">New</option>
+              <option value="PENDING">Pending</option>
+              <option value="RESOLVED">Resolved</option>
+              <option value="CLOSED">Closed</option>
+            </Form.Control>
           </Form.Group>
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={() => postNewIssue()}>Update</Button>
+        {loading ? (
+          <Spinner animation="border" role="status">
+            <span className="sr-only">Loading...</span>
+          </Spinner>
+        ) : (
+          <Button variant="primary" type="submit" onClick={() => updateIssue()}>
+            Update
+          </Button>
+        )}
       </Modal.Footer>
     </Modal>
   );

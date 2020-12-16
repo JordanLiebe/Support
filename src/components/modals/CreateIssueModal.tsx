@@ -32,6 +32,7 @@ const CreateIssueModal: FC<CreateIssueModalProps> = ({ show, setShow }) => {
       );
     };
     postNewIssueAsync();
+    setShow(false);
   };
 
   return (

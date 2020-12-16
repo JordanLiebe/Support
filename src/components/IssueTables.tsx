@@ -1,12 +1,14 @@
 import React, { FC, useContext, useEffect, useState } from 'react';
-import { Issue, GetIssues, IssueFilters } from '../api-connections/Issues';
-import { Table } from 'react-bootstrap';
+import { GetIssues } from '../api-connections/Issues';
+import { Issue, IssueFilters, CreateIssue } from '../interfaces/Issue';
+import { Table, Toast, OverlayTrigger, Tooltip, Alert } from 'react-bootstrap';
 
 import '../css/IssueTables.css';
 import AuthenticationContext from '../contexts/AuthenticationContext';
 import FiltersContext from '../contexts/FiltersContext';
 import Sidebar from './Sidebar';
 import ActionBar from './ActionBar';
+import UpdateIssueModal from './modals/UpdateIssueModal';
 
 export interface IssueTableProps extends IssueFilters {
   Issues?: Issue[];
@@ -14,13 +16,14 @@ export interface IssueTableProps extends IssueFilters {
 
 export const IssueTable: FC<IssueTableProps> = ({
   Issues,
-  Subject,
-  Priority,
-  Category,
 }: IssueTableProps) => {
   // Standard component state //
   const [updated, setUpdated] = useState<boolean>(false);
   const [issues, setIssues] = useState<Issue[]>(Issues || []);
+
+  // Update Modal State //
+  const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false);
+  const [updateIssueId, setUpdateIssueId] = useState<number>(-1);
 
   // Filters State //
   const [subject, setSubject] = useState<string>('');
@@ -37,25 +40,27 @@ export const IssueTable: FC<IssueTableProps> = ({
   const auth = useContext(AuthenticationContext);
   const filters = useContext(FiltersContext);
 
+  const getIssuesAsync = async () => {
+    setIssues(
+      await GetIssues(
+        {
+          Subject: subject,
+          Priority: priority,
+          Category: category,
+          Department: department,
+          Status: status,
+          Author: author,
+        },
+        auth.jwt,
+      ),
+    );
+    setUpdated(true);
+  };
+
   useEffect(() => {
-    const getIssuesAsync = async () => {
-      setIssues(
-        await GetIssues(
-          {
-            Subject: subject,
-            Priority: priority,
-            Category: category,
-            Department: department,
-            Status: status,
-            Author: author,
-          },
-          'Bearer ' + auth.jwt,
-        ),
-      );
-      setUpdated(true);
-    };
     getIssuesAsync();
   }, [subject, priority, category, status, updated]);
+
   return (
     <FiltersContext.Provider
       value={{
@@ -100,18 +105,8 @@ export const IssueTable: FC<IssueTableProps> = ({
       <div className="IT_Filter_Container">
         <Sidebar />
         <div className="IT_Container">
-          <ActionBar />
-          <Table
-            size="md"
-            variant="dark"
-            striped
-            style={{
-              fontSize: '20px',
-              overflow: 'auto',
-              display: 'inline-table',
-              tableLayout: 'auto',
-            }}
-          >
+          <ActionBar onUpdate={getIssuesAsync} />
+          <Table size="md" variant="dark" striped className="IT_Table">
             <thead>
               <tr>
                 <th scope="col">#</th>
@@ -130,23 +125,49 @@ export const IssueTable: FC<IssueTableProps> = ({
             <tbody>
               {issues &&
                 issues.map((issue) => (
-                  <tr key={issue.id} onClick={() => alert(issue.id)}>
+                  <tr
+                    key={issue.id}
+                    onClick={() => {
+                      setShowUpdateModal(true);
+                      setUpdateIssueId(issue.id);
+                    }}
+                    className="IT_Row"
+                  >
                     <th scope="row">{issue.id}</th>
                     <td>{issue.subject}</td>
                     <td>{issue.priority}</td>
                     <td>{issue.category}</td>
                     <td>{issue.department}</td>
                     <td>
-                      <ul>
-                        {issue.notes !== null &&
-                          issue.notes
-                            .filter((note) => note !== null)
-                            .map((note) => (
-                              <div className="IT_Note" key={note.id}>
-                                {note.content}
-                              </div>
-                            ))}
-                      </ul>
+                      {issue.notes !== null &&
+                        issue.notes
+                          .filter((note) => note !== null)
+                          .map((note) => {
+                            let date = new Date(note.created);
+                            return (
+                              <OverlayTrigger
+                                key={'OT_Trig_' + note.id}
+                                placement="right"
+                                overlay={
+                                  <Tooltip
+                                    key={'TT_' + note.id}
+                                    id={`tooltip-right`}
+                                  >
+                                    <small>{note.author}</small>
+                                    <br />
+                                    <small>{date.toLocaleString()}</small>
+                                  </Tooltip>
+                                }
+                              >
+                                <Toast
+                                  key={'TO_' + note.id}
+                                  style={{ color: 'black', margin: 'auto' }}
+                                >
+                                  <Toast.Body>{note.content}</Toast.Body>
+                                </Toast>
+                              </OverlayTrigger>
+                            );
+                          })}
                     </td>
                     <td>{issue.status}</td>
                     <td>{issue.author}</td>
@@ -159,6 +180,12 @@ export const IssueTable: FC<IssueTableProps> = ({
           </Table>
         </div>
       </div>
+      <UpdateIssueModal
+        show={showUpdateModal}
+        setShow={setShowUpdateModal}
+        issueId={updateIssueId}
+        onUpdate={getIssuesAsync}
+      />
     </FiltersContext.Provider>
   );
 };
